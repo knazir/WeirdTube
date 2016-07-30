@@ -1,4 +1,6 @@
 #!/usr/bin/python
+#
+# Usage: python videoCheck.py --videoid=<video_id>
 
 import httplib2
 import os
