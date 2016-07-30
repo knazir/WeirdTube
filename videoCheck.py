@@ -10,16 +10,17 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from oauth2client.tools import argparser, run_flow
 
+
+# # # # # # # # #
+# AUTHORIZATION #
+# # # # # # # # #
+
 CLIENT_SECRETS_FILE = "secrets/client_secrets.json"
 DEVELOPER_SECRETS_FILE = "secrets/youtube-v3-discoverydocument.json"
 YOUTUBE_READ_WRITE_SSL_SCOPE = "https://www.googleapis.com/auth/youtube.force-ssl"
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
-
-# # # # # # # # #
-# AUTHORIZATION #
-# # # # # # # # #
 
 def get_authenticated_service(args):
   flow = flow_from_clientsecrets(CLIENT_SECRETS_FILE, scope=YOUTUBE_READ_WRITE_SSL_SCOPE,
@@ -85,7 +86,6 @@ def is_video_weird(youtube, video_id):
       text = comment["snippet"]["textDisplay"]
       if is_weird(text):
         return True
-
   return False
 
 
@@ -110,5 +110,5 @@ if __name__ == "__main__":
   youtube = get_authenticated_service(args)
   try:
     check_weirdness(youtube, args.videoid)
-  except HttpError,e:
+  except HttpError, e:
     print("An HTTP error " + str(e.resp.status) + " occurred:\n" + str(e.content))
