@@ -5,5 +5,8 @@ secrets/
 # Compiled files
 *.pyc
 
+# PyCharm
+.idea/
+
 # OSX
 .DS_Store/

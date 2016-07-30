@@ -1,9 +1,7 @@
 #!/usr/bin/python
-#
 # Usage: python videoCheck.py --videoid=<video_id>
 
 import httplib2
-import os
 import sys
 
 from apiclient.discovery import build_from_document
@@ -45,8 +43,10 @@ def get_authenticated_service(args):
 
 NUM_COMMENTS_PER_PAGE = 100
 NUM_COMMENT_PAGES = 10
-WEIRD_INDICATORS = [["weird", "part", "of"], ["that's", "enough", "internet"], ["enough", "for", "today"], ["how", "did", "i", "get", "here"], 
-["what", "did", "i", "just", "watch"], ["the", "fuck", "did", "i"],["i'm", "in", "hell"], ["im", "in", "hell"], ["why", "am", "i", "watching"], ]
+WEIRD_INDICATORS = [["weird", "part", "of"], ["that's", "enough", "internet"], ["enough", "for", "today"],
+                    ["how", "did", "i", "get", "here"], ["what", "did", "i", "just", "watch"],
+                    ["the", "fuck", "did", "i"],["i'm", "in", "hell"], ["im", "in", "hell"],
+                    ["why", "am", "i", "watching"]]
 
 
 def setup_args():
@@ -102,9 +102,11 @@ def get_video_title(youtube, video_id):
 
 def check_weirdness(youtube, video_id):
   if is_video_weird(youtube, args.videoid):
-    print("Yep, " + get_video_title(youtube, args.videoid) + " (http://www.youtube.com/watch?v=" + args.videoid + ") is in the weird part of YouTube.")
+    print("Yep, " + get_video_title(youtube, args.videoid) + " (http://www.youtube.com/watch?v=" + args.videoid + ") " +
+          "is in the weird part of YouTube.")
   else:
-    print("Nope, " + get_video_title(youtube, args.videoid) + " (http://www.youtube.com/watch?v=" + args.videoid + ") is NOT in the weird part of YouTube.")
+    print("Nope, " + get_video_title(youtube, args.videoid) + " (http://www.youtube.com/watch?v=" + args.videoid + ")" +
+          " is NOT in the weird part of YouTube.")
 
 
 if __name__ == "__main__":
