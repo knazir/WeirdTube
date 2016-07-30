@@ -1,0 +1,9 @@
+# Secrets
+secrets/
+*.json
+
+# Compiled files
+*.pyc
+
+# OSX
+.DS_Store/
