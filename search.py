@@ -50,7 +50,8 @@ NUM_COMMENT_PAGES = 10
 WEIRD_INDICATORS = [
                     ["weird", "part", "of"], ["wierd", "part", "of"], ["that's enough internet"], ["enough for today"],
                     ["how", "did i get here"], ["what", "did", "i just watch"], ["the fuck did i", "watch"],
-                    ["i'm in hell"], ["im in hell"], ["am i watching"], ["side of the internet"], ["side of YouTube"]
+                    ["i'm in hell"], ["im in hell"], ["am i watching"], ["side of the internet"], ["side of YouTube"],
+                    ["what", "is this shit"], ["strangest boner"]
                    ]
 
 
@@ -230,7 +231,7 @@ def main():
         print("====")
         print("PATH")
         print("====")
-        print(path.decode)
+        print(path)
 
     except UnicodeDecodeError, e:
         print("Encountered UnicodeDecodeError while printing results.")
