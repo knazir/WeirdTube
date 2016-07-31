@@ -42,6 +42,7 @@ def get_authenticated_service(args):
 # ALGORITHM #
 # # # # # # #
 
+# Constants
 ENCODING = "utf-8"
 NUM_RELATED_VIDEOS = 10
 NUM_COMMENTS_PER_PAGE = 100
@@ -62,6 +63,12 @@ def setup_args():
         exit("Please specify videoid using the --videoid= parameter.")
     return args
 
+
+def define_globals():
+    global REASON
+    REASON = None
+
+
 def get_video_title(youtube, args):
     video_response = youtube.videos().list(
         part='snippet',
@@ -75,18 +82,17 @@ def get_first_video(youtube, args):
     return {"videoid": args.videoid, "title": get_video_title(youtube, args), "previd": None, "clicks":0}
 
 
-def is_weird(author, comment, args):
+def is_weird(author, comment):
     lowercase_comment = comment.lower()
     for indicator_list in WEIRD_INDICATORS:
         if all(token in lowercase_comment for token in indicator_list):
-            if args.showreason:
-                print('REASON: ' + author.encode(ENCODING) + ': "' + comment.encode(ENCODING) +
-                      '" had a derivation of ' + str(indicator_list)[1:-1])
+            globals()["REASON"] = 'Comment by "' + author.encode(ENCODING) + '": "' + comment.encode(ENCODING) + \
+                                  '" had a derivation of: ' + str(indicator_list)[1:-1]
             return True
     return False
 
 
-def is_video_weird(youtube, args, video):
+def is_video_weird(youtube, video):
     next_page_token = None
     for i in range(0, NUM_COMMENT_PAGES):
         results = youtube.commentThreads().list(
@@ -101,7 +107,7 @@ def is_video_weird(youtube, args, video):
             comment = item["snippet"]["topLevelComment"]
             author = comment["snippet"]["authorDisplayName"]
             text = comment["snippet"]["textDisplay"]
-            if is_weird(author, text, args):
+            if is_weird(author, text):
                 return True
 
         if "nextPageToken" in results:
@@ -111,7 +117,7 @@ def is_video_weird(youtube, args, video):
     return False
 
 
-def get_related_videos(youtube, args, prev_video):
+def get_related_videos(youtube, prev_video):
     search_response = youtube.search().list(
         part="snippet",
         type="video",
@@ -131,11 +137,11 @@ def get_related_videos(youtube, args, prev_video):
     return related_videos
 
 
-def check_weirdness(youtube, args, video):
-    if is_video_weird(youtube, args, video):
+def check_weirdness(youtube, video):
+    if is_video_weird(youtube, video):
         return None
     else:
-        return get_related_videos(youtube, args, video)
+        return get_related_videos(youtube, video)
 
 
 def reconstruct_path(video, visited_videos):
@@ -157,6 +163,7 @@ def reconstruct_path(video, visited_videos):
 
 def main():
     # Setup
+    define_globals()
     args = setup_args()
     youtube = get_authenticated_service(args)
 
@@ -189,11 +196,11 @@ def main():
 
             if video["clicks"] > highest_clicks:
                 highest_clicks = video["clicks"]
-                print("Checking " + str(math.pow(NUM_RELATED_VIDEOS, highest_clicks)) + "videos "
+                print("Checking " + str(int(math.pow(NUM_RELATED_VIDEOS, highest_clicks))) + " videos "
                       + str(highest_clicks) + " click(s) away...")
 
             # Get related videos
-            related_videos = check_weirdness(youtube, args, video)
+            related_videos = check_weirdness(youtube, video)
             if related_videos is None:
                 break
             for related_video in related_videos:
@@ -210,10 +217,13 @@ def main():
     print("=======")
     print("RESULTS")
     print("=======")
-    print("Reached the weird part of YouTube: " + video["title"] + " in " + str(video["clicks"]) + " click(s).")
+    print("Reached the weird part of YouTube: " + video["title"] + " in " + str(video["clicks"]) + " click(s) after " +
+          "examining " + str(len(visited_videos.keys())) + " videos.")
+    if args.showreason:
+        print("REASON: " + str(REASON))
 
+    # Process and print path
     path = reconstruct_path(video, visited_videos)
-
     print
     print("====")
     print("PATH")
