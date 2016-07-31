@@ -44,10 +44,9 @@ ENCODING = 'utf-8'
 NUM_COMMENTS_PER_PAGE = 100
 NUM_COMMENT_PAGES = 10
 WEIRD_INDICATORS = [
-                    ["weird", "part", "of"], ["wierd", "part", "of"], ["that's", "enough", "internet"],
-                    ["enough", "for", "today"], ["how", "did", "i", "get", "here"],
-                    ["what", "did", "i", "just", "watch"], ["the", "fuck", "did", "i"],["i'm", "in", "hell"],
-                    ["im", "in", "hell"], ["why", "am", "i", "watching"]
+                    ["weird", "part", "of"], ["wierd", "part", "of"], ["that's enough internet"], ["enough for today"],
+                    ["how", "did i get here"], ["what", "did", "i just watch"], ["the fuck did i", "watch"],
+                    ["i'm in hell"], ["im in hell"], ["why", "what", "am i watching"]
                    ]
 
 
