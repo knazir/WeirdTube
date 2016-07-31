@@ -2,6 +2,7 @@
 # Usage: python videoCheck.py --videoid=<video_id>
 
 import httplib2
+import math
 import sys
 
 from apiclient.discovery import build_from_document
@@ -186,13 +187,10 @@ def main():
                 print("DEBUG: Trying " + video["title"] + " (http://www.youtube.com/watch?v=" +
                       video["videoid"] + ") " + str(video["clicks"]) + " click(s) away.")
 
-            # Show realtime progress by directly writing to output if no debug prints will disrupt
             if video["clicks"] > highest_clicks:
                 highest_clicks = video["clicks"]
-                sys.stdout.write("\nChecking videos " + str(highest_clicks) + " click(s) away...")
-            elif not args.debug and highest_clicks > 0:
-                sys.stdout.write(".")
-
+                print("Checking " + str(math.pow(NUM_RELATED_VIDEOS, highest_clicks)) + "videos "
+                      + str(highest_clicks) + " click(s) away...")
 
             # Get related videos
             related_videos = check_weirdness(youtube, args, video)
@@ -203,7 +201,6 @@ def main():
                 if related_video["videoid"] not in visited_videos:
                     visited_videos[related_video["videoid"]] = related_video
                     queue.put(related_video)
-
 
     except HttpError, e:
         print("An HTTP error " + str(e.resp.status) + " occurred: " + str(e))
