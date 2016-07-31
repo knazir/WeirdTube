@@ -4,7 +4,7 @@ This is a small script that aims to answer two questions.
 1. Is a video in the "weird part" of YouTube?
 2. How far is a video from the "weird part" of YouTube?
 
-Heroku and API secrets have been omitted for obvious reasons.
+This repo will be updated periodically as most code changes are being pushed to the Heroku app. API secrets have been omitted for obvious reasons.
 
 
 

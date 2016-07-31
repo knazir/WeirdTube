@@ -214,22 +214,28 @@ def main():
         return
 
     # Process and print results
-    print
-    print("=======")
-    print("RESULTS")
-    print("=======")
-    print("Reached the weird part of YouTube: " + video["title"] + " in " + str(video["clicks"]) + " click(s) after " +
-          "examining " + str(len(visited_videos.keys())) + " videos.")
-    if args.showreason:
-        print("REASON: " + str(REASON))
+    try:
+        print
+        print("=======")
+        print("RESULTS")
+        print("=======")
+        print("Reached the weird part of YouTube: " + video["title"] + " in " + str(video["clicks"]) + " click(s) after " +
+              "examining " + str(len(visited_videos.keys())) + " videos.")
+        if args.showreason:
+            print("REASON: " + str(REASON))
 
-    # Process and print path
-    path = reconstruct_path(video, visited_videos)
-    print
-    print("====")
-    print("PATH")
-    print("====")
-    print(path)
+        # Process and print path
+        path = reconstruct_path(video, visited_videos).encode(ENCODING)
+        print
+        print("====")
+        print("PATH")
+        print("====")
+        print(path.decode)
+
+    except UnicodeDecodeError, e:
+        print("Encountered UnicodeDecodeError while printing results.")
+    except UnicodeEncodeError, e:
+        print("Encountered UnicodeEncodeError while printing results.")
 
 
 if __name__ == "__main__":

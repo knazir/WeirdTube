@@ -1,8 +1,0 @@
-{
-  "name": "WeirdTube Search",
-  "description": "A Python app that explores the weird part of YouTube.",
-  "image": "heroku/python",
-  "repository": "https://github.com/knazir/weird-part-of-youtube",
-  "keywords": ["python", "django" ],
-  "addons": [ "heroku-postgresql" ]
-}

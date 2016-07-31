@@ -1,11 +1,6 @@
-# Secrets
-weirdtube/
-*/secrets/
-*_secrets.json
-*-oauth2.json
-*-discoverydocument.json
-
 # Compiled files
+secrets/
+*.json
 *.pyc
 
 # PyCharm
