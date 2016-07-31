@@ -9,6 +9,7 @@ from apiclient.errors import HttpError
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from oauth2client.tools import argparser, run_flow
+from Queue import Queue
 
 
 # # # # # # # # #
@@ -41,12 +42,13 @@ def get_authenticated_service(args):
 # # # # # # #
 
 ENCODING = 'utf-8'
+NUM_RELATED_VIDEOS = 10
 NUM_COMMENTS_PER_PAGE = 100
 NUM_COMMENT_PAGES = 10
 WEIRD_INDICATORS = [
                     ["weird", "part", "of"], ["wierd", "part", "of"], ["that's", "enough", "internet"],
                     ["enough", "for", "today"], ["how", "did", "i", "get", "here"],
-                    ["what", "did", "i", "just", "watch"], ["the", "fuck", "did", "i"],["i'm", "in", "hell"],
+                    ["what", "did", "i just watch"], ["the fuck did i"],["i'm", "in", "hell"],
                     ["im", "in", "hell"], ["why", "am", "i", "watching"]
                    ]
 
@@ -59,6 +61,18 @@ def setup_args():
     if not args.videoid:
         exit("Please specify videoid using the --videoid= parameter.")
     return args
+
+def get_video_title(youtube, args):
+    video_response = youtube.videos().list(
+        part='snippet',
+        id=args.videoid
+    ).execute()
+    video = video_response.get("items", [])[0]
+    return str(video["snippet"]["title"])
+
+
+def get_first_video(youtube, args):
+    return {"videoid": args.videoid, "title": get_video_title(youtube, args), "previd": None}
 
 
 def is_weird(author, comment, args):
@@ -83,47 +97,89 @@ def is_video_weird(youtube, args):
             pageToken=next_page_token
         ).execute()
 
-        if "nextPageToken" in results:
-            next_page_token = results["nextPageToken"]
-        else:
-            return False
-
         for item in results["items"]:
             comment = item["snippet"]["topLevelComment"]
             author = comment["snippet"]["authorDisplayName"]
             text = comment["snippet"]["textDisplay"]
-            if args.debug:
-                print(author + ": " + text)
             if is_weird(author, text, args):
                 return True
+
+        if "nextPageToken" in results:
+            next_page_token = results["nextPageToken"]
+        else:
+            break
     return False
 
 
-def get_video_title(youtube, args):
-    video_response = youtube.videos().list(
-        part='snippet',
-        id=args.videoid
+def get_related_videos(youtube, args):
+    search_response = youtube.search().list(
+        part="snippet",
+        type="video",
+        maxResults=NUM_RELATED_VIDEOS,
+        relatedToVideoId=args.videoid
     ).execute()
-    video = video_response.get("items", [])[0]
-    return str(video["snippet"]["title"].encode(ENCODING))
+
+    related_videos = []
+    for search_result in search_response.get("items", []):
+        if search_result["id"]["kind"] == "youtube#video":
+            related_videos.append({
+                "videoid": search_result["id"]["videoId"],
+                "title": search_result["snippet"]["title"],
+                "previd": args.videoid
+            })
+    return related_videos
 
 
 def check_weirdness(youtube, args):
     if is_video_weird(youtube, args):
-        print("Yep, " + get_video_title(youtube, args) + " (http://www.youtube.com/watch?v=" +
-              args.videoid + ") is in the weird part of YouTube.")
+        return None
     else:
-        print("Nope, " + get_video_title(youtube, args) + " (http://www.youtube.com/watch?v=" +
-              args.videoid + ") is NOT in the weird part of YouTube.")
+        return get_related_videos(youtube, args)
 
 
 def main():
+    # Setup
     args = setup_args()
     youtube = get_authenticated_service(args)
+
+    # Visible metadata
+    queue = Queue()
+    visited_videos = {}
+    clicks = 0
+    video = get_first_video(youtube, args)
+
+    # Wrap requests
     try:
-        check_weirdness(youtube, args)
+        queue.put(video)
+        visited_videos[video["videoid"]] = video["title"]
+
+        while not queue.empty():
+            # Get next video in queue
+            video = queue.get()
+            args.videoid = video["videoid"]
+
+            if args.debug:
+                print("Trying video " + video["title"] + " (http://www.youtube.com/watch?v=" + video["videoid"] + ")")
+
+            # Get related videos
+            related_videos = check_weirdness(youtube, args)
+            if related_videos is None:
+                break
+            for related_video in related_videos:
+                if related_video["videoid"] not in visited_videos:
+                    visited_videos[related_video["videoid"]] = related_video["title"]
+                    queue.put(related_video)
+
+            # Successfully added one more more layer
+            clicks += 1
+
     except HttpError, e:
-        print("An HTTP error " + str(e.resp.status) + " occurred:\n" + str(e.content))
+        print("An HTTP error " + str(e.resp.status) + " occurred: " + str(e))
+
+    # Print results
+    print
+    print("Reached the weird part of YouTube: " + video["title"])
+    print("You were " + str(clicks) + " clicks away from the weird part of YouTube.")
 
 
 if __name__ == "__main__":
