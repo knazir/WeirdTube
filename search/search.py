@@ -50,7 +50,8 @@ NUM_COMMENT_PAGES = 10
 WEIRD_INDICATORS = [
                     ["weird", "part", "of"], ["wierd", "part", "of"], ["that's enough internet"], ["enough for today"],
                     ["how", "did i get here"], ["what", "did", "i just watch"], ["the fuck did i", "watch"],
-                    ["i'm in hell"], ["im in hell"], ["why", "what", "am i watching"]
+                    ["i'm in hell"], ["im in hell"], ["why", "what", "am i watching"], ["side of the internet"],
+                    ["side of YouTube"]
                    ]
 
 
@@ -75,7 +76,7 @@ def get_video_title(youtube, args):
         id=args.videoid
     ).execute()
     video = video_response.get("items", [])[0]
-    return str(video["snippet"]["title"])
+    return str(video["snippet"]["title"].encode(ENCODING))
 
 
 def get_first_video(youtube, args):
@@ -155,8 +156,8 @@ def reconstruct_path(video, visited_videos):
     reconstructed_path = ""
     index = 1
     for video in reversed(path):
-        reconstructed_path += str(index) + ". " + video["title"] + " (http://www.youtube.com/watch?v=" +\
-                              video["videoid"] + ") ->\n"
+        reconstructed_path += str(index) + ". " + video["title"].encode(ENCODING) + \
+                              " (http://www.youtube.com/watch?v=" + video["videoid"].encode(ENCODING) + ") ->\n"
         index += 1
     return reconstructed_path[:-4]
 
@@ -211,6 +212,7 @@ def main():
 
     except HttpError, e:
         print("An HTTP error " + str(e.resp.status) + " occurred: " + str(e))
+        return
 
     # Process and print results
     print

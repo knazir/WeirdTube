@@ -1,6 +1,8 @@
 # Secrets
-secrets/
-*.json
+*/secrets/
+*_secrets.json
+*-oauth2.json
+*-discoverydocument.json
 
 # Compiled files
 *.pyc
