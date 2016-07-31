@@ -41,7 +41,7 @@ def get_authenticated_service(args):
 # ALGORITHM #
 # # # # # # #
 
-ENCODING = 'utf-8'
+ENCODING = "utf-8"
 NUM_RELATED_VIDEOS = 10
 NUM_COMMENTS_PER_PAGE = 100
 NUM_COMMENT_PAGES = 10
@@ -71,7 +71,7 @@ def get_video_title(youtube, args):
 
 
 def get_first_video(youtube, args):
-    return {"videoid": args.videoid, "title": get_video_title(youtube, args), "previd": None}
+    return {"videoid": args.videoid, "title": get_video_title(youtube, args), "previd": None, "clicks":0}
 
 
 def is_weird(author, comment, args):
@@ -85,12 +85,12 @@ def is_weird(author, comment, args):
     return False
 
 
-def is_video_weird(youtube, args):
+def is_video_weird(youtube, args, video):
     next_page_token = None
     for i in range(0, NUM_COMMENT_PAGES):
         results = youtube.commentThreads().list(
             part="snippet",
-            videoId=args.videoid,
+            videoId=video["videoid"],
             textFormat="plainText",
             maxResults=NUM_COMMENTS_PER_PAGE,
             pageToken=next_page_token
@@ -110,7 +110,7 @@ def is_video_weird(youtube, args):
     return False
 
 
-def get_related_videos(youtube, args):
+def get_related_videos(youtube, args, prev_video):
     search_response = youtube.search().list(
         part="snippet",
         type="video",
@@ -124,16 +124,34 @@ def get_related_videos(youtube, args):
             related_videos.append({
                 "videoid": search_result["id"]["videoId"],
                 "title": search_result["snippet"]["title"],
-                "previd": args.videoid
+                "previd": prev_video["videoid"],
+                "clicks": prev_video["clicks"] + 1
             })
     return related_videos
 
 
-def check_weirdness(youtube, args):
-    if is_video_weird(youtube, args):
+def check_weirdness(youtube, args, video):
+    if is_video_weird(youtube, args, video):
         return None
     else:
-        return get_related_videos(youtube, args)
+        return get_related_videos(youtube, args, video)
+
+
+def reconstruct_path(video, visited_videos):
+    path = [video]
+    previd = video["previd"]
+    while previd is not None:
+        next_video = visited_videos[previd]
+        path.append(next_video)
+        previd = next_video["previd"]
+
+    reconstructed_path = ""
+    index = 1
+    for video in reversed(path):
+        reconstructed_path += str(index) + ". " + video["title"] + " (http://www.youtube.com/watch?v=" +\
+                              video["videoid"] + ") ->\n"
+        index += 1
+    return reconstructed_path[:-4]
 
 
 def main():
@@ -144,41 +162,57 @@ def main():
     # Visible metadata
     queue = Queue()
     visited_videos = {}
-    clicks = 0
+    highest_clicks = 0
+
+    print("================")
+    print("BEGINNING SEARCH")
+    print("================")
     video = get_first_video(youtube, args)
 
     # Wrap requests
     try:
         queue.put(video)
-        visited_videos[video["videoid"]] = video["title"]
+        visited_videos[video["videoid"]] = video
 
         while not queue.empty():
             # Get next video in queue
             video = queue.get()
-            args.videoid = video["videoid"]
 
             if args.debug:
-                print("Trying video " + video["title"] + " (http://www.youtube.com/watch?v=" + video["videoid"] + ")")
+                print("Trying " + video["title"] + " (http://www.youtube.com/watch?v=" + video["videoid"] + ") " +
+                      str(video["clicks"]) + " click(s) away.")
+
+            if video["clicks"] > highest_clicks:
+                highest_clicks = video["clicks"]
+                print("Checking videos " + str(highest_clicks) + " click(s) away...")
 
             # Get related videos
-            related_videos = check_weirdness(youtube, args)
+            related_videos = check_weirdness(youtube, args, video)
             if related_videos is None:
                 break
             for related_video in related_videos:
                 if related_video["videoid"] not in visited_videos:
-                    visited_videos[related_video["videoid"]] = related_video["title"]
+                    visited_videos[related_video["videoid"]] = related_video
                     queue.put(related_video)
 
-            # Successfully added one more more layer
-            clicks += 1
 
     except HttpError, e:
         print("An HTTP error " + str(e.resp.status) + " occurred: " + str(e))
 
-    # Print results
+    # Process and print results
     print
-    print("Reached the weird part of YouTube: " + video["title"])
-    print("You were " + str(clicks) + " clicks away from the weird part of YouTube.")
+    print("=======")
+    print("RESULTS")
+    print("=======")
+    print("Reached the weird part of YouTube: " + video["title"] + " in " + str(video["clicks"]) + " click(s).")
+
+    path = reconstruct_path(video, visited_videos)
+
+    print
+    print("====")
+    print("PATH")
+    print("====")
+    print(path)
 
 
 if __name__ == "__main__":
