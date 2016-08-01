@@ -17,8 +17,8 @@ from Queue import Queue
 # AUTHORIZATION #
 # # # # # # # # #
 
-CLIENT_SECRETS_FILE = "secrets/client_secrets.json"
-DEVELOPER_SECRETS_FILE = "secrets/youtube-v3-discoverydocument.json"
+CLIENT_SECRETS_FILE = "search/secrets/client_secrets.json"
+DEVELOPER_SECRETS_FILE = "search/secrets/youtube-v3-discoverydocument.json"
 YOUTUBE_READ_WRITE_SSL_SCOPE = "https://www.googleapis.com/auth/youtube.force-ssl"
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
@@ -75,7 +75,10 @@ def get_video_title(youtube, args):
         part='snippet',
         id=args.videoid
     ).execute()
-    video = video_response.get("items", [])[0]
+    videos = video_response.get("items", [])
+    if not videos:
+        raise HttpError("Could not find YouTube video with id " + str(args.videoid))
+    video = videos[0]
     return str(video["snippet"]["title"].encode(ENCODING))
 
 
@@ -205,6 +208,7 @@ def main():
             if related_videos is None:
                 break
             for related_video in related_videos:
+                prev_queue_size = queue.qsize()
                 if related_video["videoid"] not in visited_videos:
                     visited_videos[related_video["videoid"]] = related_video
                     queue.put(related_video)
@@ -222,7 +226,7 @@ def main():
         print("Reached the weird part of YouTube: " + video["title"] + " in " + str(video["clicks"]) +
               " click(s) after examining " + str(len(visited_videos.keys())) + " videos.")
         if args.showreason:
-            print("REASON: " + str(globals()["REASON"]))
+            print("REASON: " + str(REASON))
 
         # Process and print path
         path = reconstruct_path(video, visited_videos).encode(ENCODING)
