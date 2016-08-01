@@ -205,7 +205,6 @@ def main():
             if related_videos is None:
                 break
             for related_video in related_videos:
-                prev_queue_size = queue.qsize()
                 if related_video["videoid"] not in visited_videos:
                     visited_videos[related_video["videoid"]] = related_video
                     queue.put(related_video)
@@ -220,10 +219,10 @@ def main():
         print("=======")
         print("RESULTS")
         print("=======")
-        print("Reached the weird part of YouTube: " + video["title"] + " in " + str(video["clicks"]) + " click(s) after " +
-              "examining " + str(len(visited_videos.keys())) + " videos.")
+        print("Reached the weird part of YouTube: " + video["title"] + " in " + str(video["clicks"]) +
+              " click(s) after examining " + str(len(visited_videos.keys())) + " videos.")
         if args.showreason:
-            print("REASON: " + str(REASON))
+            print("REASON: " + str(globals()["REASON"]))
 
         # Process and print path
         path = reconstruct_path(video, visited_videos).encode(ENCODING)
