@@ -16,6 +16,7 @@ Most code changes are being pushed to the Heroku app, but this is a working bare
 # Known Issues
 * Search space increases exponentially. Anything more than 4 clicks away takes an inconceivably frustrating amount of time to complete.
 * High false positive rate (especially for videos with many comments).
+* Decoding and encoding issues with unicode characters, especially with comments/titles in other languages.
 
 
 # ToDo List
