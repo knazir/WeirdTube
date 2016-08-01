@@ -4,7 +4,7 @@ This is a small, fun project that aims to answer two questions.
 1. Is a video in the "weird part" of YouTube?
 2. How far is a video from the "weird part" of YouTube?
 
-This aims to answer the question of how far any given video is from the "weird" part of YouTube. You provide a link to a YouTube video and it tells you how far the video is from the "weird" part of YouTube in number of clicks (where each click is from the related videos). The output will also show you the path that was followed from the original video. From testing, it seems that most "weird" videos are identified. Ongoing efforts are to reduce the rate of false positives, normal videos that are marked as weird.
+This aims to answer the question of how far any given video is from the "weird" part of YouTube. You provide a link to a YouTube video and it tells you how far the video is from the "weird" part of YouTube in number of clicks (where each click is from the related videos). The output will also show you the path that was followed from the original video. From testing, it seems that most "weird" videos are identified. Ongoing efforts are to reduce the rate of false positives, normal videos that are marked as weird. Also even though it's called "WeirdTube," no list of weird videos are stored. This may be added in the future though... 
 
 One MAJOR issue is that the search space increases exponentially the farther you get from the original video. Each video searches 10 related videos and those videos search 10 of their related videos. By the time you're 6 clicks away, 1,000,000 videos have to be explored. Therefore, some searches can take an incredibly long time to complete. I'm currenlty thinking about some kind of heuristic to make a guess about which videos are "weirder" than hours. 
 
@@ -12,10 +12,13 @@ It's still very much in testing and has a lot of rough edges. And yes, I mean A 
 
 Most code changes are being pushed to the Heroku app, but this is a working barebones implementation. API secrets have been omitted for obvious reasons.
 
+
 # ToDo List
 - [ ] Add feedback button
 - [ ] Make the output prettier
 - [ ] Find heuristic to determine if a video is more "weird" than others
+- [ ] Aggregate list of "weird" videos users find and add them to a list
+
 
 # Changelog
 
