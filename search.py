@@ -155,7 +155,10 @@ def reconstruct_path(video, visited_videos):
         next_video = visited_videos[previd]
         path.append(next_video)
         previd = next_video["previd"]
+    return path
 
+
+def create_path_string(path):
     reconstructed_path = ""
     index = 1
     for video in reversed(path):
@@ -163,7 +166,6 @@ def reconstruct_path(video, visited_videos):
                               " (http://www.youtube.com/watch?v=" + video["videoid"].encode(ENCODING) + ") ->\n"
         index += 1
     return reconstructed_path[:-4]
-
 
 def main():
     # Setup
@@ -230,16 +232,21 @@ def main():
 
         # Process and print path
         path = reconstruct_path(video, visited_videos).encode(ENCODING)
+        path_string = create_path_string(path)
         print
         print("====")
         print("PATH")
         print("====")
-        print(path)
+        print(path_string)
 
     except UnicodeDecodeError, e:
-        print("Encountered UnicodeDecodeError while printing results.")
+        print("Encountered UnicodeDecodeError while printing results. Trying to salvage results: ")
+        print("Final video: " + str(video))
+        print("Reconstructed path: " + str(path))
     except UnicodeEncodeError, e:
-        print("Encountered UnicodeEncodeError while printing results.")
+        print("Encountered UnicodeEncodeError while printing results. Trying to salvage results: ")
+        print("Final video: " + str(video))
+        print("Reconstructed path: " + str(path))
 
 
 if __name__ == "__main__":
