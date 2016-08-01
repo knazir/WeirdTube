@@ -17,8 +17,8 @@ from Queue import Queue
 # AUTHORIZATION #
 # # # # # # # # #
 
-CLIENT_SECRETS_FILE = "search/secrets/client_secrets.json"
-DEVELOPER_SECRETS_FILE = "search/secrets/youtube-v3-discoverydocument.json"
+CLIENT_SECRETS_FILE = "secrets/client_secrets.json"
+DEVELOPER_SECRETS_FILE = "secrets/youtube-v3-discoverydocument.json"
 YOUTUBE_READ_WRITE_SSL_SCOPE = "https://www.googleapis.com/auth/youtube.force-ssl"
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
@@ -231,8 +231,8 @@ def main():
             print("REASON: " + str(REASON))
 
         # Process and print path
-        path = reconstruct_path(video, visited_videos).encode(ENCODING)
-        path_string = create_path_string(path)
+        path = reconstruct_path(video, visited_videos)
+        path_string = create_path_string(path).encode(ENCODING)
         print
         print("====")
         print("PATH")
