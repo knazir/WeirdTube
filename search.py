@@ -240,13 +240,27 @@ def main():
         print(path_string)
 
     except UnicodeDecodeError, e:
-        print("Encountered UnicodeDecodeError while printing results. Trying to salvage results: ")
-        print("Final video: " + str(video))
-        print("Reconstructed path: " + str(path))
+        print("Encountered UnicodeDecodeError while printing results: " + str(e))
+        print("Trying to salvage results: ")
+        try:
+            print("Final video: " + str(video))
+        except UnicodeDecodeError, e:
+            print("Unable to salvage final video: " + str(e))
+        try:
+            print("Final path: " + str(path))
+        except UnicodeDecodeError, e:
+            print("Unable to salvage final path." + str(e))
     except UnicodeEncodeError, e:
-        print("Encountered UnicodeEncodeError while printing results. Trying to salvage results: ")
-        print("Final video: " + str(video))
-        print("Reconstructed path: " + str(path))
+        print("Encountered UnicodeEncodeError while printing results: " + str(e))
+        print("Trying to salvage results:")
+        try:
+            print("Final video: " + str(video))
+        except UnicodeEncodeError, e:
+            print("Unable to salvage final video: " + str(e))
+        try:
+            print("Reconstructed path: " + str(path))
+        except UnicodeEncodeError, e:
+            print("Unable to salvage final path: " + str(e))
 
 
 if __name__ == "__main__":
