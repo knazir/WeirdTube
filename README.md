@@ -13,8 +13,14 @@ It's still very much in testing and has a lot of rough edges. And yes, I mean A 
 Most code changes are being pushed to the Heroku app, but this is a working barebones implementation. API secrets have been omitted for obvious reasons.
 
 
+# Known Issues
+* Search space increases exponentially. Anything more than 4 clicks away takes an inconceivably frustrating amount of time to complete.
+* High false positive rate (especially for videos with many comments).
+
+
 # ToDo List
 - [ ] Add feedback button
+- [ ] Make output appear dynamically (show progress while running)
 - [ ] Make the output prettier
 - [ ] Find heuristic to determine if a video is more "weird" than others
 - [ ] Aggregate list of "weird" videos users find and add them to a list
