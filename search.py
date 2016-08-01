@@ -240,6 +240,7 @@ def main():
         print(path_string)
 
     except UnicodeDecodeError, e:
+        print
         print("Encountered UnicodeDecodeError while printing results: " + str(e))
         print("Trying to salvage results: ")
 
@@ -258,6 +259,7 @@ def main():
             print("Path was unset upon failure: " + str(e))
 
     except UnicodeEncodeError, e:
+        print
         print("Encountered UnicodeEncodeError while printing results: " + str(e))
         print("Trying to salvage results:")
 
