@@ -53,7 +53,7 @@ Trying to reduce the number of false positives. Combining separate words should 
 
 Changes 7/31/16:
 ----------------
-    ["weird", "part", "of"], ["wierd", "part", "of"], ["that's enough internet"], ["enough for today"],
+    ["weird part of"], ["wierd part of"], ["that's enough internet"], ["enough for today"],
     ["how", "did i get here"], ["what", "did", "i just watch"], ["the fuck did i", "watch"],
     ["i'm in hell"], ["im in hell"], ["am i watching"], ["side of the internet"], ["side of YouTube"],
     ["what", "is this shit"], ["strangest boner"]
